@@ -18,6 +18,10 @@ public class NeuroNet {
         buildNet(cfg);
     }
 
+    public static float randomWeight(Random random, float max) {return random.nextFloat() * max - max / 2;}
+
+    public static float randomWeight(Random random) {return random.nextFloat() - 0.5f;}
+
     public void buildDefaultNet() {
         /*final Random random = new Random();
 
@@ -72,12 +76,11 @@ public class NeuroNet {
             for (Neuron inputNeuron : inputLayer) {
                 final NeuronLink link = new NeuronLink();
                 link.setInput(inputNeuron);
-                link.setWeight(random.nextFloat() - 0.5f);
+                link.setWeight(randomWeight(random));
                 middleNeuron.getInputs().add(link);
             }
         }
     }
-
 
     public List<Float> process(List<Float> inputs) {
         resetVals();
