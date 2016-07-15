@@ -11,44 +11,19 @@ public class NeuroNet {
     private double error;
 
     public NeuroNet() {
-        buildDefaultNet();
+        buildNet(Arrays.asList(3, 5, 1));
+    }
+
+    public NeuroNet(NetStorableData netStorableData) {
+        buildNet(netStorableData.layerConfig);
+        setWeightGenes(netStorableData.weights);
     }
 
     public NeuroNet(List<Integer> cfg) {
         buildNet(cfg);
     }
 
-    public void buildDefaultNet() {
-        /*final Random random = new Random();
-
-        final ArrayList<Neuron> inputLayer = new ArrayList<>();
-        inputLayer.add(new Neuron());
-        inputLayer.add(new Neuron());
-        inputLayer.add(new Neuron());
-        final ArrayList<Neuron> middleLayer = new ArrayList<>();
-        middleLayer.add(new Neuron());
-        middleLayer.add(new Neuron());
-        middleLayer.add(new Neuron());
-        middleLayer.add(new Neuron());
-        middleLayer.add(new Neuron());
-
-        linkLayers(random, inputLayer, middleLayer);
-
-        final ArrayList<Neuron> outputLayer = new ArrayList<>();
-        outputLayer.add(new Neuron());
-
-        linkLayers(random,middleLayer,outputLayer);
-
-        layerConfig.addAll(Arrays.asList(3,5,1));
-        neurons=new ArrayList<>();
-        neurons.add(inputLayer);
-        neurons.add(middleLayer);
-        neurons.add(outputLayer);*/
-
-        buildNet(Arrays.asList(3, 5, 1));
-    }
-
-    public void buildNet(List<Integer> cfg) {
+    private void buildNet(List<Integer> cfg) {
         final Random random = new Random();
         layerConfig = cfg;
         neurons = new ArrayList<>();
@@ -129,5 +104,22 @@ public class NeuroNet {
 
     public void setError(double error) {
         this.error = error;
+    }
+
+    public NetStorableData getStorableData() {
+        return new NetStorableData(layerConfig, getWeightGenes());
+    }
+
+    public static class NetStorableData {
+        private List<Integer> layerConfig;
+        private List<Float> weights;
+
+        public NetStorableData(List<Integer> layerConfig, List<Float> weights) {
+            this.layerConfig = layerConfig;
+            this.weights = weights;
+        }
+
+        public NetStorableData() {
+        }
     }
 }

@@ -1,9 +1,15 @@
 package org.fruttech.neurogene;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class Evolver {
@@ -11,6 +17,7 @@ public class Evolver {
     private static final double MUTATION_CHANCE = 0.1;
     private final List<Integer> layersConfig;
     private Random rnd = new Random();
+    private ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     public Evolver(List<Integer> layersConfig) {
         this.layersConfig = layersConfig;
@@ -31,6 +38,8 @@ public class Evolver {
         double error = Double.MAX_VALUE;
         int epoch = 0;
         while (contunueEvolution(maxEpoches, targetError, epoch, error)) {
+            final CountDownLatch countDownLatch = new CountDownLatch(populationSize);
+
             for (NeuroNet net : population) {
                 double sum = 0;
                 for (DataLine line : data) {
@@ -44,6 +53,12 @@ public class Evolver {
                 }
                 final double nerror = Math.sqrt(sum);
                 net.setError(nerror);
+                countDownLatch.countDown();
+            }
+
+            try {
+                countDownLatch.await();
+            } catch (InterruptedException e) {
             }
 
             population.sort(Comparator.comparingDouble(NeuroNet::getError));
@@ -65,15 +80,17 @@ public class Evolver {
 
 
             error = winner1.getError();
-            if (epoch % 100 == 0) System.out.println("Epoch [" + epoch + "] winner error: " + winner1.getError());
+            if (epoch % 100 == 0) System.out.println("Epoch [" + epoch + "]\twinner error: " + winner1.getError());
             epoch++;
         }
 
+        final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        System.out.println("Winner: " + gson.toJson(population.get(0).getStorableData()));
         return population.get(0);
     }
 
     private NeuroNet breed(NeuroNet parent1, NeuroNet parent2) {
-        final NeuroNet child = new NeuroNet();
+        final NeuroNet child = new NeuroNet(layersConfig);
         final List<Float> parent1WeightGenes = parent1.getWeightGenes();
         final List<Float> parent2WeightGenes = parent2.getWeightGenes();
         final List<Float> childWeightGenes = new ArrayList<>(parent1WeightGenes.size());
@@ -98,8 +115,7 @@ public class Evolver {
     private List<NeuroNet> generateFirstPopulation(int populationSize) {
         final List<NeuroNet> population = new ArrayList<>(populationSize);
         for (int i = 0; i < populationSize; i++) {
-            final NeuroNet neuroNet = new NeuroNet();
-            neuroNet.buildDefaultNet();
+            final NeuroNet neuroNet = new NeuroNet(layersConfig);
             population.add(neuroNet);
         }
         return population;
