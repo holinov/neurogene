@@ -51,7 +51,7 @@ public class Evolver {
                         sum += delta * delta;
                     }
                 }
-                final double nerror = Math.sqrt(sum);
+                final double nerror = Math.sqrt(sum) / data.size();
                 net.setError(nerror);
                 countDownLatch.countDown();
             }
@@ -80,7 +80,7 @@ public class Evolver {
 
 
             error = winner1.getError();
-            if (epoch % 100 == 0) System.out.println("Epoch [" + epoch + "]\twinner error: " + winner1.getError());
+            if (epoch % 100 == 0) System.out.printf("Epoch [%5d] winner error: %s%n", epoch, winner1.getError());
             epoch++;
         }
 

@@ -20,13 +20,49 @@ public class App {
             dataLines.add(line);
         }
 
+        final String net1 = "{\n" +
+                "  \"layerConfig\": [\n" +
+                "    3,\n" +
+                "    5,\n" +
+                "    1\n" +
+                "  ],\n" +
+                "  \"weights\": [\n" +
+                "    0.6948342,\n" +
+                "    0.13406599,\n" +
+                "    -0.058102444,\n" +
+                "    -0.3166605,\n" +
+                "    0.13389918,\n" +
+                "    0.19271499,\n" +
+                "    0.99713475,\n" +
+                "    0.12976697,\n" +
+                "    0.68221635,\n" +
+                "    0.93035424,\n" +
+                "    0.44445583,\n" +
+                "    0.13623436,\n" +
+                "    -0.12307447,\n" +
+                "    0.9531664,\n" +
+                "    0.6492687,\n" +
+                "    0.25635505,\n" +
+                "    -0.38092393,\n" +
+                "    0.99095744,\n" +
+                "    0.8454099,\n" +
+                "    0.4975139\n" +
+                "  ],\n" +
+                "  \"error\": 0.1477888430790542\n" +
+                "}";
+        final NeuroNet net = new NeuroNet(net1);
+        final int lineIndex = 87;
+        final List<Float> input = dataLines.get(lineIndex).input;
+        final List<Float> output = dataLines.get(lineIndex).output;
+        final List<Float> res1 = net.process(input);
+        System.out.println("Result: " + res1 + " targetResult: " + output);
+
         System.out.println("Start evolution.");
         final Evolver evolver = new Evolver(Arrays.asList(3, 5, 1));
-        final NeuroNet neuroNet = evolver.evolveForData(dataLines, 500, null, 0.2);
-        final List<Float> input = dataLines.get(3).input;
+        final NeuroNet neuroNet = evolver.evolveForData(dataLines, 500, null, 0.001);
         final List<Float> res = neuroNet.process(input);
         System.out.println("Finished evolution.");
-        System.out.println("Result: " + res + " error:" + neuroNet.getError() + " targetResult: " + dataLines.get(3).output);
+        System.out.println("Result: " + res + " error:" + neuroNet.getError() + " targetResult: " + output);
 
     }
 }

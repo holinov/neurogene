@@ -1,5 +1,8 @@
 package org.fruttech.neurogene;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -15,12 +18,16 @@ public class NeuroNet {
     }
 
     public NeuroNet(NetStorableData netStorableData) {
-        buildNet(netStorableData.layerConfig);
-        setWeightGenes(netStorableData.weights);
+        setStorableData(netStorableData);
     }
 
     public NeuroNet(List<Integer> cfg) {
         buildNet(cfg);
+    }
+
+    public NeuroNet(String json) {
+        final Gson gson = new GsonBuilder().create();
+        setStorableData(gson.fromJson(json, NetStorableData.class));
     }
 
     private void buildNet(List<Integer> cfg) {
@@ -52,7 +59,6 @@ public class NeuroNet {
             }
         }
     }
-
 
     public List<Float> process(List<Float> inputs) {
         resetVals();
@@ -107,16 +113,24 @@ public class NeuroNet {
     }
 
     public NetStorableData getStorableData() {
-        return new NetStorableData(layerConfig, getWeightGenes());
+        return new NetStorableData(layerConfig, getWeightGenes(), error);
+    }
+
+    private void setStorableData(NetStorableData netStorableData) {
+        buildNet(netStorableData.layerConfig);
+        setWeightGenes(netStorableData.weights);
+        setError(netStorableData.error);
     }
 
     public static class NetStorableData {
         private List<Integer> layerConfig;
         private List<Float> weights;
+        private double error;
 
-        public NetStorableData(List<Integer> layerConfig, List<Float> weights) {
+        public NetStorableData(List<Integer> layerConfig, List<Float> weights, double error) {
             this.layerConfig = layerConfig;
             this.weights = weights;
+            this.error = error;
         }
 
         public NetStorableData() {
