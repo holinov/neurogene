@@ -3,19 +3,21 @@ package org.fruttech.neurogene;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class App {
     public static void main(String[] args) {
+        final Random random = new Random();
         List<DataLine> dataLines = new ArrayList<>(100);
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
             final DataLine line = new DataLine();
             line.input = new ArrayList<>();
             for (int j = 0; j < 3; j++) {
-                line.input.add(i * 1.0f + j);
+                line.input.add(random.nextDouble());
             }
             line.output = new ArrayList<>();
-            line.output.add(i * 1.0f + (float) line.input.stream().collect(Collectors.summarizingDouble(v -> v)).getSum());
+            line.output.add(Math.sin(line.input.stream().collect(Collectors.summarizingDouble(v -> v)).getSum()));
 
             dataLines.add(line);
         }
@@ -52,18 +54,28 @@ public class App {
                 "}";
         final NeuroNet net = new NeuroNet(net1);
         final int lineIndex = 87;
-        final List<Float> input = dataLines.get(lineIndex).input;
-        final List<Float> output = dataLines.get(lineIndex).output;
-        final List<Float> res1 = net.process(input);
+        final List<Double> input = dataLines.get(lineIndex).input;
+        final List<Double> output = dataLines.get(lineIndex).output;
+        final List<Double> res1 = net.process(input);
         System.out.println("Result: " + res1 + " targetResult: " + output);
 
         System.out.println("Start evolution.");
-        final Evolver evolver = new Evolver(Arrays.asList(3, 5, 1));
-        final NeuroNet neuroNet = evolver.evolveForData(dataLines, 500, null, 0.001);
-        final List<Float> res = neuroNet.process(input);
-        System.out.println("Finished evolution.");
-        System.out.println("Result: " + res + " error:" + neuroNet.getError() + " targetResult: " + output);
+        final Evolver evolver = new Evolver(Arrays.asList(3, 5, 2, 1));
+        final NeuroNet neuroNet = evolver.evolveForData(dataLines, 100, null, 0.001);
 
+        for (int i = 0; i < 10; i++) {
+            final DataLine line = new DataLine();
+            line.input = new ArrayList<>();
+            for (int j = 0; j < 3; j++) {
+                line.input.add(random.nextDouble());
+            }
+            line.output = new ArrayList<>();
+            line.output.add(Math.sin(line.input.stream().collect(Collectors.summarizingDouble(v -> v)).getSum()));
+
+            final List<Double> res = neuroNet.process(input);
+            System.out.println("Result: " + res + " targetResult: " + output + " error:" + neuroNet.getError());
+
+        }
     }
 }
 

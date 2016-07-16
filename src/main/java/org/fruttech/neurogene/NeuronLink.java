@@ -2,7 +2,7 @@ package org.fruttech.neurogene;
 
 public class NeuronLink {
     private Neuron input;
-    private float weight;
+    private double weight;
 
     public Neuron getInput() {
         return input;
@@ -12,11 +12,11 @@ public class NeuronLink {
         this.input = input;
     }
 
-    public float getWeight() {
+    public double getWeight() {
         return weight;
     }
 
-    public void setWeight(float weight) {
+    public void setWeight(double weight) {
         this.weight = weight;
     }
 }

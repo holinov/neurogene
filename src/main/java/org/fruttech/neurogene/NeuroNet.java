@@ -31,7 +31,7 @@ public class NeuroNet {
     }
 
     private void buildNet(List<Integer> cfg) {
-        final Random random = new Random();
+        final Random random = new Random(System.currentTimeMillis());
         layerConfig = cfg;
         neurons = new ArrayList<>();
         for (int layerSize : cfg) {
@@ -54,13 +54,13 @@ public class NeuroNet {
             for (Neuron inputNeuron : inputLayer) {
                 final NeuronLink link = new NeuronLink();
                 link.setInput(inputNeuron);
-                link.setWeight(random.nextFloat() - 0.5f);
+                link.setWeight(random.nextDouble());
                 middleNeuron.getInputs().add(link);
             }
         }
     }
 
-    public List<Float> process(List<Float> inputs) {
+    public List<Double> process(List<Double> inputs) {
         resetVals();
         final List<Neuron> inputLayer = inputLayer();
         for (int i = 0; i < inputLayer.size(); i++) {
@@ -72,19 +72,19 @@ public class NeuroNet {
             layer.forEach(Neuron::countVal);
         }
 
-        final List<Float> res = new ArrayList<>();
+        final List<Double> res = new ArrayList<>();
         outputLayer().forEach(n -> res.add(n.getVal()));
         return res;
     }
 
-    public List<Float> getWeightGenes() {
+    public List<Double> getWeightGenes() {
         return neurons.stream().flatMap(Collection::stream)
                 .flatMap(n -> n.getInputs().stream())
                 .map(NeuronLink::getWeight)
                 .collect(Collectors.toList());
     }
 
-    public void setWeightGenes(List<Float> genes) {
+    public void setWeightGenes(List<Double> genes) {
         geneIdx = 0;
         neurons.forEach(layer -> layer.forEach(n -> n.getInputs().forEach(link -> {
             link.setWeight(genes.get(geneIdx));
@@ -124,10 +124,10 @@ public class NeuroNet {
 
     public static class NetStorableData {
         private List<Integer> layerConfig;
-        private List<Float> weights;
+        private List<Double> weights;
         private double error;
 
-        public NetStorableData(List<Integer> layerConfig, List<Float> weights, double error) {
+        public NetStorableData(List<Integer> layerConfig, List<Double> weights, double error) {
             this.layerConfig = layerConfig;
             this.weights = weights;
             this.error = error;
