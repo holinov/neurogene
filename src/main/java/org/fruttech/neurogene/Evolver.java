@@ -12,13 +12,22 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-
 public class Evolver {
 
     private static final double MUTATION_CHANCE = 0.10;
     private final List<Integer> layersConfig;
     private Random rnd = new Random(System.currentTimeMillis());
     private ExecutorService executorService = Executors.newFixedThreadPool(4);
+    private EvolverHandler handler = new EvolverHandler() {
+        @Override
+        public void epoch(int epoch, NeuroNet winner1, List<NeuroNet> population, List<DataLine> data) {
+            final double avgEpochError = population.stream().collect(Collectors.averagingDouble(NeuroNet::getError));
+            if (epoch % 100 == 0) {
+                System.out.printf("Epoch [%5d] winner error: %.8f avg epoch error: %.8f%n",
+                        epoch, winner1.getError(), avgEpochError);
+            }
+        }
+    };
 
     public Evolver(List<Integer> layersConfig) {
         this.layersConfig = layersConfig;
@@ -69,10 +78,14 @@ public class Evolver {
             }
 
             population.sort(Comparator.comparingDouble(NeuroNet::getError));
-            final List<NeuroNet> sortedPopulation = new ArrayList<>(population);
-
             final NeuroNet winner1 = population.get(0);
             final NeuroNet winner2 = population.get(1);
+            if (handler != null)
+                handler.epoch(epoch, winner1, population, data);
+
+            //final List<NeuroNet> sortedPopulation = new ArrayList<>(population);
+
+
             NeuroNet child = breed(winner1, winner2);
             population.remove(population.size() - 1);
 
@@ -89,13 +102,6 @@ public class Evolver {
 
             population.add(child);
 
-
-            error = winner1.getError();
-            if (epoch % 100 == 0) {
-                final double avgEpochError = sortedPopulation.stream().collect(Collectors.averagingDouble(NeuroNet::getError));
-                System.out.printf("Epoch [%5d] winner error: %.8f avg epoch error: %.8f%n",
-                        epoch, winner1.getError(), avgEpochError);
-            }
             epoch++;
         }
 

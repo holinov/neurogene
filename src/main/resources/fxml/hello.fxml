@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" id="AnchorPane" maxHeight="-Infinity"
+            maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="158.0" prefWidth="247.0"
+            xmlns="http://javafx.com/javafx/2.2"
+            fx:controller="org.fruttech.neurogene.gui.MainController">
+    <children>
+        <Canvas layoutX="24" layoutY="14" width="200" height="200" fx:id="canvas"/>
+    </children>
+</AnchorPane>

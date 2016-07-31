@@ -9,18 +9,7 @@ import java.util.stream.Collectors;
 public class App {
     public static void main(String[] args) {
         final Random random = new Random();
-        List<DataLine> dataLines = new ArrayList<>(100);
-        for (int i = 0; i < 1000; i++) {
-            final DataLine line = new DataLine();
-            line.input = new ArrayList<>();
-            for (int j = 0; j < 3; j++) {
-                line.input.add(random.nextDouble());
-            }
-            line.output = new ArrayList<>();
-            line.output.add(Math.sin(line.input.stream().collect(Collectors.summarizingDouble(v -> v)).getSum()));
-
-            dataLines.add(line);
-        }
+        List<DataLine> dataLines = getDataLines(random);
 
         final String net1 = "{\n" +
                 "  \"layerConfig\": [\n" +
@@ -76,6 +65,22 @@ public class App {
             System.out.println("Result: " + res + " targetResult: " + output + " error:" + neuroNet.getError());
 
         }
+    }
+
+    private static List<DataLine> getDataLines(Random random) {
+        List<DataLine> dataLines = new ArrayList<>(100);
+        for (int i = 0; i < 1000; i++) {
+            final DataLine line = new DataLine();
+            line.input = new ArrayList<>();
+            for (int j = 0; j < 3; j++) {
+                line.input.add(random.nextDouble());
+            }
+            line.output = new ArrayList<>();
+            line.output.add(Math.sin(line.input.stream().collect(Collectors.summarizingDouble(v -> v)).getSum()));
+
+            dataLines.add(line);
+        }
+        return dataLines;
     }
 }
 
